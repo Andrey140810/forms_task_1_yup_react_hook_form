@@ -1,0 +1,24 @@
+.app {
+	text-align: center;
+}
+
+.errorLabel {
+	color: red;
+}
+
+.formLabel {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 15px;
+	margin-bottom: 20px;
+	font-size: 20px;
+}
+
+.formLabel input {
+	border: 0.5px solid gray;
+	border-radius: 8px;
+	width: 300px;
+	height: 35px;
+	font-size: 16px;
+}
