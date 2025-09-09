@@ -11,14 +11,16 @@ const sendFormData = (formData) => {
 const fieldsSchema = yup.object()
 	.shape({
 		email: yup.string()
-			.matches(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/, 'Неверный email. Проверьте ваш email на соответствие RFC 5322'),
+			.required('Заполните email')
+			.email('Неверный email'),
 		password: yup.string()
+			.required('Заполните пароль')
 			.matches(/(?=.*[a-z])(?=.*[A-Z])/, 'Некорректный пароль. Пароль должен содержать хотя бы 1 строчную и 1 заглавную букву')
 			.matches(/(?=.*\d)(?=.*[!@#$%^&*])/, 'Некорректный пароль. Пароль должен содержать хотя бы 1 цифру и символ !@#$%^&*')
 			.min(8, 'Некорректный пароль. Пароль должен быть не менее 8 символов'),
 		repeatPassword: yup.string()
 			.required('Ошибка. Повторите пароль')
-			.oneOf([yup.ref('password')], 'Некорректный повтор пароля. Пароли должны совпадать')
+			.oneOf([yup.ref('password'), null], 'Некорректный повтор пароля. Пароли должны совпадать')
 	})
 
 export function App() {
@@ -39,13 +41,6 @@ export function App() {
 	})
 
 	const repeatPassword = watch('repeatPassword')
-	const password = watch('password')
-
-	useEffect(() => {
-		if (touchedFields.repeatPassword) {
-			trigger('repeatPassword')
-		}
-	}, [password, touchedFields.repeatPassword, trigger])
 
 	useEffect(() => {
 		if (repeatPassword && isValid) {
@@ -64,9 +59,9 @@ export function App() {
 			{passwordError && <div className={styles.errorLabel}>{passwordError}</div>}
 			{repeatPasswordError && <div className={styles.errorLabel}>{repeatPasswordError}</div>}
 			<input name='email' type="text" placeholder='Email' {...register('email')} />
-			<input name='password' type="password" placeholder='Пароль' {...register('password')} />
+			<input name='password' type="password" placeholder='Пароль' {...register('password', {onChange: () => touchedFields.repeatPassword && trigger('repeatPassword')})} />
 			<input name='repeatPassword' type="password" placeholder='Повторите пароль' {...register('repeatPassword')} />
-			<button ref={submitButtonRef} type='submit' disabled={!!emailError || !!passwordError || !!repeatPasswordError}>Зарегистрироваться</button>
+			<button ref={submitButtonRef} type='submit' disabled={!!emailError || !!passwordError || repeatPasswordError}>Зарегистрироваться</button>
 		</form>
 	</div>
   )
